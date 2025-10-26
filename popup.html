@@ -14,13 +14,21 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>🔊 Amplificador de Volumen</h1>
+      <h1>Amplificador de Volumen</h1>
     </div>
     
     <div class="control-section">
       <div class="volume-display">
         <span class="volume-value" id="volumeValue">100</span>
         <span class="volume-unit">%</span>
+      </div>
+      
+      <div class="presets">
+        <button class="preset-btn" data-volume="50">Bajo</button>
+        <button class="preset-btn" data-volume="100">Normal</button>
+        <button class="preset-btn" data-volume="200">Medio</button>
+        <button class="preset-btn" data-volume="300">Alto</button>
+        <button class="preset-btn" data-volume="600">Máximo</button>
       </div>
       
       <div class="slider-container">
@@ -42,6 +50,54 @@
       <div class="buttons">
         <button id="resetBtn" class="btn btn-secondary">Resetear</button>
         <button id="applyBtn" class="btn btn-primary">Aplicar</button>
+      </div>
+    </div>
+    
+    <div class="equalizer-section">
+      <div class="equalizer-header">
+        <h2>🎚️ Ecualizador</h2>
+        <label class="toggle-switch">
+          <input type="checkbox" id="eqToggle">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      
+      <div class="equalizer-content" id="eqContent">
+        <div class="eq-presets">
+          <select id="eqMode" class="eq-select">
+            <option value="normal">🎵 Normal</option>
+            <option value="voice">🎤 Refuerzo de Voz</option>
+            <option value="bass">🔊 Refuerzo de Graves</option>
+            <option value="treble">✨ Refuerzo de Agudos</option>
+            <option value="cinema">🎬 Cine</option>
+            <option value="rock">🎸 Rock/Pop</option>
+            <option value="classical">🎼 Clásica</option>
+            <option value="gaming">🎮 Gaming</option>
+          </select>
+        </div>
+        
+        <div class="eq-bands" id="eqBands">
+          <div class="eq-band">
+            <input type="range" min="-12" max="12" value="0" step="1" class="eq-slider" data-freq="60">
+            <label>60Hz</label>
+          </div>
+          <div class="eq-band">
+            <input type="range" min="-12" max="12" value="0" step="1" class="eq-slider" data-freq="230">
+            <label>230Hz</label>
+          </div>
+          <div class="eq-band">
+            <input type="range" min="-12" max="12" value="0" step="1" class="eq-slider" data-freq="910">
+            <label>910Hz</label>
+          </div>
+          <div class="eq-band">
+            <input type="range" min="-12" max="12" value="0" step="1" class="eq-slider" data-freq="4000">
+            <label>4kHz</label>
+          </div>
+          <div class="eq-band">
+            <input type="range" min="-12" max="12" value="0" step="1" class="eq-slider" data-freq="14000">
+            <label>14kHz</label>
+          </div>
+        </div>
       </div>
     </div>
     

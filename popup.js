@@ -11,8 +11,25 @@ const applyBtn = document.getElementById('applyBtn');
 const resetBtn = document.getElementById('resetBtn');
 const status = document.getElementById('status');
 const rememberSite = document.getElementById('rememberSite');
+const presetBtns = document.querySelectorAll('.preset-btn');
+const eqToggle = document.getElementById('eqToggle');
+const eqContent = document.getElementById('eqContent');
+const eqMode = document.getElementById('eqMode');
+const eqSliders = document.querySelectorAll('.eq-slider');
 
 let currentTab;
+
+// Presets del ecualizador (valores en dB para cada banda: 60Hz, 230Hz, 910Hz, 4kHz, 14kHz)
+const EQ_PRESETS = {
+  normal: [0, 0, 0, 0, 0],
+  voice: [-3, 0, 5, 4, -2],      // Enfatiza medios para voz
+  bass: [8, 5, 0, -2, -3],       // Potencia graves
+  treble: [-3, -2, 0, 5, 8],     // Potencia agudos
+  cinema: [6, 2, -1, 3, 5],      // Balance cinematográfico
+  rock: [5, 3, -2, 3, 5],        // Curva en V
+  classical: [-1, 0, 2, 3, 2],   // Suave y detallado
+  gaming: [4, 1, 2, 4, 3]        // Balance para gaming
+};
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', async () => {
@@ -22,11 +39,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Cargar configuración guardada
   await loadSavedVolume();
+  
+  // Configurar botones de presets
+  setupPresets();
+  
+  // Configurar ecualizador
+  setupEqualizer();
 });
 
 // Actualizar el valor mostrado cuando se mueve el slider
 volumeSlider.addEventListener('input', (e) => {
   volumeValue.textContent = e.target.value;
+  updatePresetButtons(parseInt(e.target.value));
 });
 
 // Aplicar el volumen
@@ -34,15 +58,26 @@ applyBtn.addEventListener('click', async () => {
   const volume = parseInt(volumeSlider.value);
   
   try {
+    // Obtener configuración del ecualizador si está activo
+    const eqEnabled = eqToggle.checked;
+    const eqValues = eqEnabled ? getEqValues() : null;
+    
     // Enviar mensaje al content script
     await chrome.tabs.sendMessage(currentTab.id, {
       action: 'setVolume',
-      volume: volume
+      volume: volume,
+      equalizer: eqEnabled ? {
+        enabled: true,
+        values: eqValues
+      } : { enabled: false }
     });
     
     // Guardar configuración si está marcada la opción
     if (rememberSite.checked) {
       await saveVolumeForSite(volume);
+      if (eqEnabled) {
+        await saveEqualizerForSite(eqMode.value, eqValues);
+      }
     }
     
     // Actualizar el badge del icono
@@ -150,5 +185,138 @@ async function updateBadge(volume) {
     }
     
     await chrome.action.setBadgeBackgroundColor({ color: color });
+  }
+}
+
+// Configurar botones de presets
+function setupPresets() {
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const volume = parseInt(btn.dataset.volume);
+      volumeSlider.value = volume;
+      volumeValue.textContent = volume;
+      updatePresetButtons(volume);
+    });
+  });
+  
+  // Actualizar botones según el valor inicial
+  updatePresetButtons(parseInt(volumeSlider.value));
+}
+
+// Actualizar estado visual de los botones de preset
+function updatePresetButtons(currentVolume) {
+  presetBtns.forEach(btn => {
+    const btnVolume = parseInt(btn.dataset.volume);
+    if (btnVolume === currentVolume) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+}
+
+// Configurar ecualizador
+function setupEqualizer() {
+  // Toggle del ecualizador
+  eqToggle.addEventListener('change', () => {
+    if (eqToggle.checked) {
+      eqContent.classList.add('active');
+      // Aplicar automáticamente cuando se activa
+      applyCurrentSettings();
+    } else {
+      eqContent.classList.remove('active');
+      // Aplicar automáticamente cuando se desactiva
+      applyCurrentSettings();
+    }
+  });
+  
+  // Cambio de modo predefinido
+  eqMode.addEventListener('change', () => {
+    const mode = eqMode.value;
+    const values = EQ_PRESETS[mode];
+    setEqSliders(values);
+    
+    // Aplicar automáticamente si el EQ está activo
+    if (eqToggle.checked) {
+      applyCurrentSettings();
+    }
+  });
+  
+  // Listener para sliders individuales
+  eqSliders.forEach(slider => {
+    slider.addEventListener('input', () => {
+      // Aplicar automáticamente si el EQ está activo
+      if (eqToggle.checked) {
+        applyCurrentSettings();
+      }
+    });
+  });
+  
+  // Cargar configuración guardada del ecualizador
+  loadSavedEqualizer();
+}
+
+// Aplicar configuración actual (volumen + ecualizador)
+async function applyCurrentSettings() {
+  const volume = parseInt(volumeSlider.value);
+  const eqEnabled = eqToggle.checked;
+  const eqValues = eqEnabled ? getEqValues() : null;
+  
+  try {
+    // Enviar mensaje al content script
+    await chrome.tabs.sendMessage(currentTab.id, {
+      action: 'setVolume',
+      volume: volume,
+      equalizer: eqEnabled ? {
+        enabled: true,
+        values: eqValues
+      } : { enabled: false }
+    });
+    
+    // Actualizar el badge del icono
+    await updateBadge(volume);
+    
+    console.log('✓ Configuración aplicada:', { volume, eqEnabled, eqValues });
+  } catch (error) {
+    console.error('Error al aplicar configuración:', error);
+  }
+}
+
+// Establecer valores en los sliders del ecualizador
+function setEqSliders(values) {
+  eqSliders.forEach((slider, index) => {
+    slider.value = values[index];
+  });
+}
+
+// Obtener valores actuales del ecualizador
+function getEqValues() {
+  return Array.from(eqSliders).map(slider => parseFloat(slider.value));
+}
+
+// Guardar configuración del ecualizador para el sitio
+async function saveEqualizerForSite(mode, values) {
+  const key = getSiteKey();
+  await chrome.storage.sync.set({ 
+    [`eq_mode_${key}`]: mode,
+    [`eq_values_${key}`]: values 
+  });
+}
+
+// Cargar configuración guardada del ecualizador
+async function loadSavedEqualizer() {
+  const key = getSiteKey();
+  const result = await chrome.storage.sync.get([`eq_mode_${key}`, `eq_values_${key}`]);
+  
+  if (result[`eq_mode_${key}`]) {
+    eqToggle.checked = true;
+    eqContent.classList.add('active');
+    eqMode.value = result[`eq_mode_${key}`];
+    
+    if (result[`eq_values_${key}`]) {
+      setEqSliders(result[`eq_values_${key}`]);
+    } else {
+      setEqSliders(EQ_PRESETS[result[`eq_mode_${key}`]]);
+    }
   }
 }
