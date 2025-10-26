@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!-- 
+  Amplificador de Volumen
+  Copyright (c) 2025 Norberto CH <nchaquer@gmail.com>
+  Licensed under the MIT License
+-->
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amplificador de Volumen</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔊 Amplificador de Volumen</h1>
+    </div>
+    
+    <div class="control-section">
+      <div class="volume-display">
+        <span class="volume-value" id="volumeValue">100</span>
+        <span class="volume-unit">%</span>
+      </div>
+      
+      <div class="slider-container">
+        <input 
+          type="range" 
+          min="0" 
+          max="600" 
+          value="100" 
+          class="volume-slider" 
+          id="volumeSlider"
+        >
+        <div class="slider-labels">
+          <span>0%</span>
+          <span>100%</span>
+          <span>600%</span>
+        </div>
+      </div>
+      
+      <div class="buttons">
+        <button id="resetBtn" class="btn btn-secondary">Resetear</button>
+        <button id="applyBtn" class="btn btn-primary">Aplicar</button>
+      </div>
+    </div>
+    
+    <div class="info">
+      <p class="status" id="status">Ajusta el volumen y presiona Aplicar</p>
+    </div>
+    
+    <div class="footer">
+      <label class="checkbox-container">
+        <input type="checkbox" id="rememberSite">
+        <span>Recordar para este sitio</span>
+      </label>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
