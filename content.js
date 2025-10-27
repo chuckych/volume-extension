@@ -4,8 +4,9 @@
  * Licensed under the MIT License
  */
 
-// Content Script - Se ejecuta en cada página web
-console.log('🔊 Amplificador de Volumen cargado');
+// Content Script - Se ejecuta en cada página web (incluidos iframes)
+const isInIframe = window !== window.top;
+console.log(`🔊 Amplificador de Volumen cargado ${isInIframe ? '(dentro de iframe)' : '(página principal)'}`);
 
 // Contexto de audio para procesamiento
 let audioContext;

@@ -1,8 +1,18 @@
 # 📋 CHANGELOG - Amplificador de Volumen
 
+## Versión 1.2.1 - 27 de Octubre 2025
+
+### Correcciones
+
+-  **CRÍTICO**: Solucionado soporte para videos dentro de iframes
+  - Los videos de YouTube embebidos ahora funcionan correctamente
+  - Videos en iframes de aplicaciones web ahora responden al amplificador y ecualizador
+  - Content script se inyecta en todos los frames (incluidos iframes cross-origin)
+  - Detección automática de contexto (página principal vs iframe)
+
 ## Versión 1.2.0 - 26 de Octubre 2025
 
-### Nueva Característica: Ecualizador de 5 Bandas
+### ✨ Nueva Característica: Ecualizador de 5 Bandas
 
 #### 🎚️ Sistema de Ecualización
 
