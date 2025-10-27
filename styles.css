@@ -4,6 +4,71 @@
  * Licensed under the MIT License
  */
 
+/* Variables CSS para temas */
+:root {
+  /* Modo Claro (por defecto) */
+  --bg-gradient-start: #667eea;
+  --bg-gradient-end: #764ba2;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.9);
+  --text-muted: rgba(255, 255, 255, 0.8);
+  
+  --control-bg: rgba(255, 255, 255, 0.1);
+  --control-bg-hover: rgba(255, 255, 255, 0.15);
+  --control-bg-active: rgba(255, 255, 255, 0.25);
+  --control-border: rgba(255, 255, 255, 0.3);
+  --control-border-active: rgba(255, 255, 255, 0.5);
+  
+  --slider-bg: rgba(255, 255, 255, 0.2);
+  --slider-thumb: #ffffff;
+  
+  --btn-primary-bg: #ffffff;
+  --btn-primary-text: #667eea;
+  --btn-primary-hover: #f0f0f0;
+  
+  --btn-secondary-bg: rgba(255, 255, 255, 0.2);
+  --btn-secondary-text: #ffffff;
+  --btn-secondary-hover: rgba(255, 255, 255, 0.3);
+  
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-strong: rgba(0, 0, 0, 0.2);
+  
+  --toggle-bg: rgba(255, 255, 255, 0.2);
+  --toggle-active: #4ade80;
+}
+
+/* Modo Oscuro */
+body.dark-mode {
+  --bg-gradient-start: #1a1a2e;
+  --bg-gradient-end: #16213e;
+  --text-primary: #e4e4e7;
+  --text-secondary: rgba(228, 228, 231, 0.9);
+  --text-muted: rgba(228, 228, 231, 0.7);
+  
+  --control-bg: rgba(255, 255, 255, 0.05);
+  --control-bg-hover: rgba(255, 255, 255, 0.08);
+  --control-bg-active: rgba(255, 255, 255, 0.12);
+  --control-border: rgba(255, 255, 255, 0.15);
+  --control-border-active: rgba(255, 255, 255, 0.3);
+  
+  --slider-bg: rgba(255, 255, 255, 0.15);
+  --slider-thumb: #e4e4e7;
+  
+  --btn-primary-bg: #667eea;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #5568d3;
+  
+  --btn-secondary-bg: rgba(255, 255, 255, 0.1);
+  --btn-secondary-text: #e4e4e7;
+  --btn-secondary-hover: rgba(255, 255, 255, 0.15);
+  
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --shadow-strong: rgba(0, 0, 0, 0.5);
+  
+  --toggle-bg: rgba(255, 255, 255, 0.1);
+  --toggle-active: #4ade80;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -12,38 +77,93 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: linear-gradient(135deg, #0a27ab 0%, #080708 100%);
-  min-width: 320px;
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  min-width: 340px;
   min-height: 400px;
+  transition: background 0.3s ease;
 }
 
 .container {
   padding: 20px;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .header {
   text-align: center;
   margin-bottom: 25px;
-  /* alinear el texto al centro */
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  padding: 0 45px; /* Espacio para el botón */
 }
 
 .header h1 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 2px 4px var(--shadow-color);
+  margin: 0;
+  margin-right: 10px; /* Espacio entre h1 y botón */
+  flex: 1;
+  text-align: center;
+}
+
+/* Botón de cambio de tema */
+.theme-toggle {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--control-bg);
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.theme-toggle:hover {
+  background: var(--control-bg-hover);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.theme-toggle:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+/* Mostrar/ocultar iconos según el modo */
+body:not(.dark-mode) .theme-toggle .moon-icon {
+  display: none;
+}
+
+body.dark-mode .theme-toggle .sun-icon {
+  display: none;
+}
+
+.theme-toggle .sun-icon,
+.theme-toggle .moon-icon {
+  position: absolute;
 }
 
 .control-section {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--control-bg);
   backdrop-filter: blur(10px);
   border-radius: 15px;
   padding: 25px;
   margin-bottom: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px var(--shadow-color);
 }
 
 .volume-display {
@@ -54,13 +174,15 @@ body {
 .volume-value {
   font-size: 48px;
   font-weight: 700;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 8px var(--shadow-strong);
+  color: var(--text-primary);
 }
 
 .volume-unit {
   font-size: 24px;
   margin-left: 5px;
   opacity: 0.8;
+  color: var(--text-muted);
 }
 
 .presets {
@@ -76,10 +198,10 @@ body {
   min-width: 70px;
   padding: 10px 8px;
   padding-top: 32px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--control-bg-hover);
+  border: 1px solid var(--control-border);
   border-radius: 8px;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -103,9 +225,9 @@ body {
 }
 
 .preset-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--control-bg-active);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px var(--shadow-strong);
 }
 
 .preset-btn:active {
@@ -113,9 +235,9 @@ body {
 }
 
 .preset-btn.active {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  background: var(--control-bg-active);
+  border-color: var(--control-border-active);
+  box-shadow: 0 0 10px var(--control-border-active);
 }
 
 .slider-container {
@@ -126,7 +248,7 @@ body {
   width: 100%;
   height: 8px;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--slider-bg);
   outline: none;
   cursor: pointer;
   appearance: none;
@@ -138,9 +260,9 @@ body {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--slider-thumb);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px var(--shadow-strong);
   transition: transform 0.2s ease;
 }
 
@@ -152,10 +274,10 @@ body {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--slider-thumb);
   cursor: pointer;
   border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px var(--shadow-strong);
   transition: transform 0.2s ease;
 }
 
@@ -169,6 +291,7 @@ body {
   margin-top: 8px;
   font-size: 12px;
   opacity: 0.8;
+  color: var(--text-muted);
 }
 
 .buttons {
@@ -191,24 +314,24 @@ body {
 }
 
 .btn-primary {
-  background: #fff;
-  color: #667eea;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
 }
 
 .btn-primary:hover {
-  background: #f0f0f0;
+  background: var(--btn-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px var(--shadow-strong);
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  border: 1px solid var(--control-border);
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--btn-secondary-hover);
   transform: translateY(-2px);
 }
 
@@ -219,7 +342,7 @@ body {
 .info {
   text-align: center;
   padding: 15px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--control-bg);
   border-radius: 10px;
   margin-bottom: 15px;
 }
@@ -227,6 +350,7 @@ body {
 .status {
   font-size: 13px;
   opacity: 0.9;
+  color: var(--text-secondary);
 }
 
 .status.success {
@@ -249,6 +373,7 @@ body {
   cursor: pointer;
   font-size: 13px;
   opacity: 0.9;
+  color: var(--text-secondary);
 }
 
 .checkbox-container input[type="checkbox"] {
@@ -264,12 +389,12 @@ body {
 
 /* Ecualizador */
 .equalizer-section {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--control-bg);
   backdrop-filter: blur(10px);
   border-radius: 15px;
   padding: 20px;
   margin-bottom: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px var(--shadow-color);
 }
 
 .equalizer-header {
@@ -304,7 +429,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--toggle-bg);
   border-radius: 24px;
   transition: 0.3s;
 }
@@ -316,13 +441,13 @@ body {
   width: 18px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background-color: var(--slider-thumb);
   border-radius: 50%;
   transition: 0.3s;
 }
 
 .toggle-switch input:checked + .toggle-slider {
-  background-color: #4ade80;
+  background-color: var(--toggle-active);
 }
 
 .toggle-switch input:checked + .toggle-slider:before {
@@ -350,10 +475,10 @@ body {
 .eq-select {
   width: 100%;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--control-bg-hover);
+  border: 1px solid var(--control-border);
   border-radius: 8px;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -361,8 +486,8 @@ body {
 }
 
 .eq-select option {
-  background: #667eea;
-  color: #fff;
+  background: var(--bg-gradient-start);
+  color: var(--text-primary);
 }
 
 .eq-bands {
@@ -385,18 +510,21 @@ body {
   margin-top: 8px;
   opacity: 0.8;
   white-space: nowrap;
+  color: var(--text-muted);
 }
 
 .eq-slider {
-  -webkit-appearance: slider-vertical;
-  appearance: slider-vertical;
-  writing-mode: bt-lr;
+  /* Método estándar para sliders verticales */
+  writing-mode: vertical-lr;
+  direction: rtl;
   width: 8px;
   height: 100px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--slider-bg);
   border-radius: 4px;
   outline: none;
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .eq-slider::-webkit-slider-thumb {
@@ -405,17 +533,55 @@ body {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--slider-thumb);
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px var(--shadow-strong);
 }
 
 .eq-slider::-moz-range-thumb {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--slider-thumb);
   cursor: pointer;
   border: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px var(--shadow-strong);
+}
+
+/* Scrollbar personalizado */
+/* Para navegadores basados en Webkit (Chrome, Edge, etc.) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+  margin: 5px 0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--control-bg-active);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--control-border-active);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--slider-thumb);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Para Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--control-bg-active) transparent;
 }

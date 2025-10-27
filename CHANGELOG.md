@@ -1,5 +1,16 @@
 # 📋 CHANGELOG - Amplificador de Volumen
 
+## Versión 1.3.0 - 27 de Octubre 2025
+
+### ✨ Nueva Característica: Modo Oscuro/Claro Automático
+
+- **Detección automática del tema del sistema**:
+  - La extensión ahora detecta si el sistema operativo está en modo oscuro o claro
+  - Cambia automáticamente el tema de la interfaz de la extensión para coincidir
+
+### Correcciones
+- Optimización del rendimiento general
+
 ## Versión 1.2.1 - 27 de Octubre 2025
 
 ### Correcciones

@@ -195,18 +195,28 @@ const observer = new MutationObserver((mutations) => {
       if (node.nodeType === 1) { // Element node
         if (node.tagName === 'AUDIO' || node.tagName === 'VIDEO') {
           // Si hay un volumen guardado en la sesión, aplicarlo
-          if (sessionStorage.getItem('volumeBoost')) {
-            const volume = parseInt(sessionStorage.getItem('volumeBoost'));
-            const equalizerConfig = JSON.parse(sessionStorage.getItem('equalizerConfig') || '{"enabled":false}');
-            applyVolumeBoost(node, volume, equalizerConfig);
+          try {
+            if (sessionStorage.getItem('volumeBoost')) {
+              const volume = parseInt(sessionStorage.getItem('volumeBoost'));
+              const equalizerConfig = JSON.parse(sessionStorage.getItem('equalizerConfig') || '{"enabled":false}');
+              applyVolumeBoost(node, volume, equalizerConfig);
+            }
+          } catch (error) {
+            // Ignorar errores de sessionStorage
           }
         }
         // Buscar dentro del nodo agregado
         const mediaElements = node.querySelectorAll?.('audio, video');
-        if (mediaElements && sessionStorage.getItem('volumeBoost')) {
-          const volume = parseInt(sessionStorage.getItem('volumeBoost'));
-          const equalizerConfig = JSON.parse(sessionStorage.getItem('equalizerConfig') || '{"enabled":false}');
-          mediaElements.forEach(el => applyVolumeBoost(el, volume, equalizerConfig));
+        if (mediaElements) {
+          try {
+            if (sessionStorage.getItem('volumeBoost')) {
+              const volume = parseInt(sessionStorage.getItem('volumeBoost'));
+              const equalizerConfig = JSON.parse(sessionStorage.getItem('equalizerConfig') || '{"enabled":false}');
+              mediaElements.forEach(el => applyVolumeBoost(el, volume, equalizerConfig));
+            }
+          } catch (error) {
+            // Ignorar errores de sessionStorage
+          }
         }
       }
     });
@@ -225,9 +235,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const volume = request.volume;
     const equalizer = request.equalizer || { enabled: false };
     
-    // Guardar en sessionStorage para elementos que se carguen después
-    sessionStorage.setItem('volumeBoost', volume);
-    sessionStorage.setItem('equalizerConfig', JSON.stringify(equalizer));
+    // Guardar en sessionStorage para elementos que se carguen después (si está disponible)
+    try {
+      sessionStorage.setItem('volumeBoost', volume);
+      sessionStorage.setItem('equalizerConfig', JSON.stringify(equalizer));
+    } catch (error) {
+      // Ignorar errores de sessionStorage en contextos sandboxed
+      console.warn('⚠️ No se pudo guardar en sessionStorage:', error.message);
+    }
     
     // Aplicar a todos los elementos existentes
     const count = processAllMediaElements(volume, equalizer);
@@ -244,11 +259,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Aplicar volumen guardado al cargar la página
 window.addEventListener('load', () => {
-  const savedVolume = sessionStorage.getItem('volumeBoost');
-  if (savedVolume) {
-    const equalizerConfig = JSON.parse(sessionStorage.getItem('equalizerConfig') || '{"enabled":false}');
-    setTimeout(() => {
-      processAllMediaElements(parseInt(savedVolume), equalizerConfig);
-    }, 500); // Pequeño delay para asegurar que todo esté cargado
+  try {
+    const savedVolume = sessionStorage.getItem('volumeBoost');
+    if (savedVolume) {
+      const equalizerConfig = JSON.parse(sessionStorage.getItem('equalizerConfig') || '{"enabled":false}');
+      setTimeout(() => {
+        processAllMediaElements(parseInt(savedVolume), equalizerConfig);
+      }, 500); // Pequeño delay para asegurar que todo esté cargado
+    }
+  } catch (error) {
+    // Ignorar errores de sessionStorage en contextos sandboxed
+    console.warn('⚠️ SessionStorage no disponible en este contexto:', error.message);
   }
 });

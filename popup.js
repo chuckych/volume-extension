@@ -16,6 +16,7 @@ const eqToggle = document.getElementById('eqToggle');
 const eqContent = document.getElementById('eqContent');
 const eqMode = document.getElementById('eqMode');
 const eqSliders = document.querySelectorAll('.eq-slider');
+const themeToggle = document.getElementById('themeToggle');
 
 let currentTab;
 
@@ -36,6 +37,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Obtener la pestaña actual
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   currentTab = tab;
+  
+  // Inicializar tema
+  initTheme();
   
   // Cargar configuración guardada
   await loadSavedVolume();
@@ -263,6 +267,12 @@ async function applyCurrentSettings() {
   const eqValues = eqEnabled ? getEqValues() : null;
   
   try {
+    // Verificar que tengamos una pestaña válida
+    if (!currentTab || !currentTab.id) {
+      console.warn('⚠️ No hay pestaña activa válida');
+      return;
+    }
+    
     // Enviar mensaje al content script
     await chrome.tabs.sendMessage(currentTab.id, {
       action: 'setVolume',
@@ -278,7 +288,10 @@ async function applyCurrentSettings() {
     
     console.log('✓ Configuración aplicada:', { volume, eqEnabled, eqValues });
   } catch (error) {
-    console.error('Error al aplicar configuración:', error);
+    // Solo mostrar error si no es por falta de pestaña válida
+    if (error.message && !error.message.includes('Receiving end does not exist')) {
+      console.error('Error al aplicar configuración:', error);
+    }
   }
 }
 
@@ -320,3 +333,55 @@ async function loadSavedEqualizer() {
     }
   }
 }
+
+// ==================== TEMA OSCURO/CLARO ====================
+
+// Inicializar tema
+function initTheme() {
+  // Verificar si hay una preferencia guardada
+  const savedTheme = localStorage.getItem('theme');
+  
+  if (savedTheme) {
+    // Usar tema guardado
+    applyTheme(savedTheme);
+  } else {
+    // Detectar preferencia del sistema
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(prefersDark ? 'dark' : 'light');
+  }
+  
+  // Listener para cambios en el tema del sistema
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    // Solo aplicar si no hay preferencia guardada
+    if (!localStorage.getItem('theme')) {
+      applyTheme(e.matches ? 'dark' : 'light');
+    }
+  });
+}
+
+// Aplicar tema
+function applyTheme(theme) {
+  if (theme === 'dark') {
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
+  }
+}
+
+// Toggle de tema
+themeToggle.addEventListener('click', () => {
+  const isDark = document.body.classList.contains('dark-mode');
+  const newTheme = isDark ? 'light' : 'dark';
+  
+  // Aplicar nuevo tema
+  applyTheme(newTheme);
+  
+  // Guardar preferencia
+  localStorage.setItem('theme', newTheme);
+  
+  // Pequeña animación
+  themeToggle.style.transform = 'translateY(-50%) rotate(360deg)';
+  setTimeout(() => {
+    themeToggle.style.transform = 'translateY(-50%)';
+  }, 300);
+});
